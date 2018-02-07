@@ -114,9 +114,14 @@ logger.prototype.err_blockStart = function (message, logtag) {
 }
 
 // * │ Something went wrong                                     │ * //
-logger.prototype.err = function (message, logtag) {
+logger.prototype.err = function (message, logtag, error = null) {
 	if (!pass_tagcheck(logtag)) { return }
 	if (!message) { return }
+	if (error && error.stack) {
+		message += ': ' + error.stack
+	} else if (error) {
+		message += ': ' + error
+	}
 	log(chalk.red(rpad(message, FRAME_WIDTH)))
 }
 
