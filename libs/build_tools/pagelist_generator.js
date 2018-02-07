@@ -121,12 +121,36 @@ pagelist_generator.prototype.generate_cms_list = function () {
 				}
 			}
 
-			// goes throught the glob, crops the filename and builds a pagelist
-			files.map((file) => {
-				return file.match('/cms/(.*).js')[1].split('/')
-			}).forEach((pagepath) => {
-				build(pagepath, pagelist, pagepath)
-			})
+				const cms_prefix = enduro.project_path + '/cms'
+				files = files.sort((a, b) => {
+					var a_is_generator = a.startsWith(cms_prefix + '/generators')
+					var b_is_generator = b.startsWith(cms_prefix + '/generators')
+					var a_is_global = a.startsWith(cms_prefix + '/global')
+					var b_is_global = b.startsWith(cms_prefix + '/global')
+
+					a = a.slice(cms_prefix.length).replace(/^\/generators/, '')
+					b = b.slice(cms_prefix.length).replace(/^\/generators/, '')
+
+					if (a_is_global && !b_is_global) return 1
+					if (!a_is_global && b_is_global) return -1
+
+					if (a < b) return -1
+					if (a > b) return 1
+
+					if (a == b) {
+						if (a_is_generator && !b_is_generator) return 1
+						if (!a_is_generator && b_is_generator) return -1
+					}
+
+					return 0
+				})
+
+				// goes throught the glob, crops the filename and builds a pagelist
+				files.map((file) => {
+					return file.match('/cms/(.*).js')[1].split('/')
+				}).forEach((pagepath) => {
+					build(pagepath, pagelist, pagepath)
+				})
 
 			composed_pagelist = {
 				structured: pagelist,
