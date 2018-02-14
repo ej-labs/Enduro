@@ -29,6 +29,12 @@ enduro_configurator.prototype.read_config = function () {
 		read_config_file(SECRET_CONFIG_PATH, default_configuration.default_secret_configuration)
 	])
 		.then(() => {
+			if (process.env.NODE_ENV) {
+				read_config_file(enduro.project_path + `/enduro.${process.env.NODE_ENV}.json`, {})
+			}
+			return
+		})
+		.then(() => {
 
 			// abstract/edit the just read configuration
 
