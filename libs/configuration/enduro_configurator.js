@@ -30,9 +30,8 @@ enduro_configurator.prototype.read_config = function () {
 	])
 		.then(() => {
 			if (process.env.NODE_ENV) {
-				read_config_file(enduro.project_path + `/enduro.${process.env.NODE_ENV}.json`, {})
+				return read_config_file(enduro.project_path + `/enduro.${process.env.NODE_ENV}.json`, {})
 			}
-			return
 		})
 		.then(() => {
 
