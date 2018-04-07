@@ -48,21 +48,21 @@ describe('path handling by page renderer', function () {
 		const generated_path = internal_page_renderer.__get__('get_absolute_template_path_by_context_path')('index')
 		expect(generated_path.toLowerCase()).to.contain('index.hbs')
 		expect(generated_path.toLowerCase()).to.contain('pages')
-		expect(generated_path.toLowerCase()).to.contain('enduro')
+		expect(generated_path.toLowerCase()).to.contain('ejoyduro')
 	})
 
 	it('should convert relative filename to absolute path even if it is prepended by /', function () {
 		const generated_path = internal_page_renderer.__get__('get_absolute_template_path_by_context_path')('/index')
 		expect(generated_path.toLowerCase()).to.contain('index.hbs')
 		expect(generated_path.toLowerCase()).to.contain('pages')
-		expect(generated_path.toLowerCase()).to.contain('enduro')
+		expect(generated_path.toLowerCase()).to.contain('ejoyduro')
 	})
 
 	it('should convert relative generator filename to absolute path', function () {
 		const generated_path = internal_page_renderer.__get__('get_absolute_template_path_by_context_path')('generators/docs/kitchen')
 		expect(generated_path.toLowerCase()).to.contain('docs.hbs')
 		expect(generated_path.toLowerCase()).to.contain('pages')
-		expect(generated_path.toLowerCase()).to.contain('enduro')
+		expect(generated_path.toLowerCase()).to.contain('ejoyduro')
 	})
 
 })
