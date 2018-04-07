@@ -104,12 +104,14 @@ juicebox.prototype.force_pack = function (user) {
 		// sets user to developer if juicing is caused by console
 		user = user || 'developer'
 
+		logger.timestamp('forcepack')
+
 		// skip juicing if juicing is not enabled or disabled by flags
 		if (!enduro.config.juicebox_enabled || enduro.flags.nojuice) {
 			return resolve()
 		}
 
-		get_latest_juice()
+		get_latest_local_juice()
 			.then((juice) => {
 				juice.history = juice.history || []
 
@@ -150,7 +152,7 @@ juicebox.prototype.force_pack = function (user) {
 juicebox.prototype.diff_current_to_latest_juicebox = function () {
 	const self = this
 
-	return get_latest_local_juice()
+	return get_latest_local_juicebox_hash()
 		.then((latest_local_juicebox_hash) => {
 			return juice_helpers.get_diff_folder_with_cms(path.join('juicebox', 'staging', latest_local_juicebox_hash, 'cms'))
 		})
@@ -260,11 +262,20 @@ function get_latest_juice () {
 		})
 }
 
-// gets latest juice from the local juice.json
-function get_latest_local_juice () {
+// gets latest juice hash from the local juice.json
+function get_latest_local_juicebox_hash () {
 	return read_juicefile()
 		.then((latest_juicebox_data) => {
 			return latest_juicebox_data.latest.hash
+		})
+}
+
+// gets latest juice from the local juice.json
+function get_latest_local_juice() {
+	return read_juicefile()
+		.catch(() => {
+			// juicefile doesn't exist yet - let's create a new juicefile
+			return write_juicefile(get_new_juicefile())
 		})
 }
 
