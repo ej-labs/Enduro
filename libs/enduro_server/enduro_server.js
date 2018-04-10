@@ -27,7 +27,7 @@ const brick_handler = require(enduro.enduro_path + '/libs/bricks/brick_handler')
 // initialization of the sessions
 app.set('trust proxy', 1)
 app.use(session({
-	secret: 'keyboard cat',
+	secret: 'xejoyx',
 	resave: false,
 	saveUninitialized: true,
 	cookie: {},
@@ -37,9 +37,9 @@ app.use(cookieParser())
 
 app.use(cors())
 
-// add enduro.js header
+// add ejoy header
 app.use(function (req, res, next) {
-	res.header('X-Powered-By', 'enduro.js')
+	res.header('X-Powered-By', 'ejoy')
 	next()
 })
 
@@ -114,8 +114,8 @@ enduro_server.prototype.run = function (server_setup) {
 
 				trollhunter.login(req)
 					.then(() => {
-
-						let requested_url = req.url
+						// ignore query params
+						let requested_url = req.path
 
 						let a = requested_url.split('/').filter(x => x.length)
 						// serves index.html when empty or culture-only url is provided
