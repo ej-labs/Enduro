@@ -25,9 +25,15 @@ module.exports = {
 			alias: 'p',
 			describe: 'will not start the production flavor',
 		},
+		'debug': {
+			alias: 'd',
+			describe: 'Output all log',
+		},
 	},
 	handler: function (cli_arguments) {
 		const enduro_instance = require('../index')
+
+		 
 
 		enduro_instance.init({ flags: cli_arguments })
 			.then(() => {
