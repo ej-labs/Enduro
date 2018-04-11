@@ -132,9 +132,13 @@ enduro_server.prototype.run = function (server_setup) {
 					}, () => {
 						throw new Error('user not logged in')
 					})
-					.then((requested_url) => {
+					.then((requested_url) => {  
 						// serves the requested file
-						res.sendFile(enduro.project_path + '/' + enduro.config.build_folder + requested_url + '.html')
+						res.sendFile(enduro.project_path + '/' + enduro.config.build_folder + requested_url + '.html', function(err) {
+							if(err) {
+								res.sendFile(enduro.project_path + '/' + enduro.config.build_folder + '/' + 'index.html')
+							}
+						});
 					}, () => {
 						res.sendFile(enduro.config.admin_folder + '/enduro_login/index.html')
 					})
