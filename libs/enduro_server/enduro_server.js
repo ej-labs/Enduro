@@ -26,12 +26,14 @@ const brick_handler = require(enduro.enduro_path + '/libs/bricks/brick_handler')
 
 // initialization of the sessions
 app.set('trust proxy', 1)
-app.use(session({
-	secret: 'xejoyx',
-	resave: false,
-	saveUninitialized: true,
-	cookie: {},
-}))
+app.use(
+	session({
+		secret: 'xejoyx',
+		resave: false,
+		saveUninitialized: true,
+		cookie: {}
+	})
+)
 
 app.use(cookieParser())
 
@@ -57,18 +59,20 @@ enduro_server.prototype.run = function (server_setup) {
 	server_setup = server_setup || {}
 
 	return new Promise(function (resolve, reject) {
-
 		// overrides the port by system environment variable
-		enduro.config.port = process.env.PORT || enduro.flags.port || enduro.config.port || 5000
+		enduro.config.port =
+			process.env.PORT || enduro.flags.port || enduro.config.port || 5000
 
 		// starts listening to request on specified port
 		enduro.server = app.listen(enduro.config.port, function () {
-			logger.timestamp('Production server started at port ' + enduro.config.port, 'enduro_events')
+			logger.timestamp(
+				'Production server started at port ' + enduro.config.port,
+				'enduro_events'
+			)
 			if (!server_setup.development_mode && !enduro.flags.nocompile) {
-				enduro.actions.render()
-					.then(() => {
-						resolve()
-					})
+				enduro.actions.render().then(() => {
+					resolve()
+				})
 			} else {
 				resolve()
 			}
@@ -79,22 +83,31 @@ enduro_server.prototype.run = function (server_setup) {
 
 		// serve static files from /_generated folder
 		app.use('/admin', express.static(enduro.config.admin_folder))
-		app.use('/assets', express.static(enduro.project_path + '/' + enduro.config.build_folder + '/assets'))
-		app.use('/_prebuilt', express.static(enduro.project_path + '/' + enduro.config.build_folder + '/_prebuilt'))
+		app.use(
+			'/assets',
+			express.static(
+				enduro.project_path + '/' + enduro.config.build_folder + '/assets'
+			)
+		)
+		app.use(
+			'/_prebuilt',
+			express.static(
+				enduro.project_path + '/' + enduro.config.build_folder + '/_prebuilt'
+			)
+		)
 		app.use('/remote', express.static(enduro.project_path + '/remote'))
 
 		// handle for executing enduro refresh from client
 		app.get('/admin_api_refresh', function (req, res) {
-			enduro.actions.render()
-				.then(() => {
-					res.send({ success: true, message: 'enduro refreshed successfully' })
-				})
+			enduro.actions.render().then(() => {
+				res.send({ success: true, message: 'enduro refreshed successfully' })
+			})
 		})
 
 		// robots.txt
 		app.get('/robots.txt', function (req, res) {
 			res.type('text/plain')
-			res.send("User-agent: *\nAllow: /")
+			res.send('User-agent: *\nAllow: /')
 		})
 
 		// serve bricks' static assets
@@ -111,37 +124,62 @@ enduro_server.prototype.run = function (server_setup) {
 
 			// exclude admin calls and access to static assets
 			if (!/admin\/(.*)/.test(req.url) && !/assets\/(.*)/.test(req.url)) {
+				trollhunter
+					.login(req)
+					.then(
+						() => {
+							// ignore query params
+							let requested_url = req.path
 
-				trollhunter.login(req)
-					.then(() => {
-						// ignore query params
-						let requested_url = req.path
-
-						let a = requested_url.split('/').filter(x => x.length)
-						// serves index.html when empty or culture-only url is provided
-						if (requested_url.length <= 1 ||
-							(requested_url.split('/')[1] && enduro.config.cultures.indexOf(requested_url.split('/')[1]) + 1 && requested_url.split('/').length <= 2) ||
-							a[a.length - 1].indexOf('.') === -1
-						) {
-							requested_url += requested_url.slice(-1) === '/' ? 'index' : '/index'
-						}
-
-						// applies ab testing
-						return ab_tester.get_ab_tested_filepath(requested_url, req, res)
-
-					}, () => {
-						throw new Error('user not logged in')
-					})
-					.then((requested_url) => {  
-						// serves the requested file
-						res.sendFile(enduro.project_path + '/' + enduro.config.build_folder + requested_url + '.html', function(err) {
-							if(err) {
-								res.sendFile(enduro.project_path + '/' + enduro.config.build_folder + '/' + 'index.html')
+							let a = requested_url.split('/').filter(x => x.length)
+							// serves index.html when empty or culture-only url is provided
+							if (
+								requested_url.length <= 1 ||
+								(requested_url.split('/')[1] &&
+									enduro.config.cultures.indexOf(requested_url.split('/')[1]) +
+										1 &&
+									requested_url.split('/').length <= 2) ||
+								a[a.length - 1].indexOf('.') === -1
+							) {
+								requested_url +=
+									requested_url.slice(-1) === '/' ? 'index' : '/index'
 							}
-						});
-					}, () => {
-						res.sendFile(enduro.config.admin_folder + '/enduro_login/index.html')
-					})
+
+							// applies ab testing
+							return ab_tester.get_ab_tested_filepath(requested_url, req, res)
+						},
+						() => {
+							throw new Error('user not logged in')
+						}
+					)
+					.then(
+						requested_url => {
+							// serves the requested file
+							res.sendFile(
+								enduro.project_path +
+									'/' +
+									enduro.config.build_folder +
+									requested_url +
+									'.html',
+								function (err) {
+									if (err) {
+										res.sendFile(
+											enduro.project_path +
+												'/' +
+												enduro.config.build_folder +
+												'/' +
+												'404/index.html'
+										)
+									}
+								}
+							)
+						},
+						() => {
+							res.sendFile(
+								enduro.config.admin_folder + '/enduro_login/index.html'
+							)
+						}
+					)
 			}
 		})
 
