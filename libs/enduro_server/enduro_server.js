@@ -163,12 +163,26 @@ enduro_server.prototype.run = function (server_setup) {
 									'.html',
 								function (err) {
 									if (err) {
+										const newUrl = requested_url.replace(/^\/(\w\w)\//i, '/en/')
 										res.sendFile(
 											enduro.project_path +
 												'/' +
 												enduro.config.build_folder +
-												'/' +
-												'404/index.html'
+												newUrl +
+												'.html',
+											function (err) {
+												if (err) {
+													res
+														.status(404)
+														.sendFile(
+															enduro.project_path +
+																'/' +
+																enduro.config.build_folder +
+																'/' +
+																'404/index.html'
+														)
+												}
+											}
 										)
 									}
 								}
