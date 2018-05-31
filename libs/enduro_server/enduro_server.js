@@ -82,17 +82,22 @@ enduro_server.prototype.run = function (server_setup) {
 		website_app.forward(app, enduro.server)
 
 		// serve static files from /_generated folder
-		app.use('/admin', express.static(enduro.config.admin_folder))
+		app.use(
+			'/admin',
+			express.static(enduro.config.admin_folder, { maxAge: 360000 })
+		)
 		app.use(
 			'/assets',
 			express.static(
-				enduro.project_path + '/' + enduro.config.build_folder + '/assets'
+				enduro.project_path + '/' + enduro.config.build_folder + '/assets',
+				{ maxAge: 360000 }
 			)
 		)
 		app.use(
 			'/_prebuilt',
 			express.static(
-				enduro.project_path + '/' + enduro.config.build_folder + '/_prebuilt'
+				enduro.project_path + '/' + enduro.config.build_folder + '/_prebuilt',
+				{ maxAge: 360000 }
 			)
 		)
 		app.use('/remote', express.static(enduro.project_path + '/remote'))
